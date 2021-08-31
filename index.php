@@ -1,116 +1,94 @@
 <?php
+
+//Starting the session once again to start variable data
 session_start();
 
-$conn=mysqli_connect("localhost","root","","shoppingchart");
+//check to make sure the user is actually logged in.
+if (!isset($_SESSION['username'])) {
+    $_SESSION['msg'] = "You have to log in first";
+    header('location: login.php');
+}
 
-if(isset($_POST['add']))
-{
- if(isset($_SESSION['shoppingchart'])){
-   $item_array_id=array_column($_SESSION['shoppingchart'],'item_id');
-   if(!in_array($_GET['id'],$item_array_id))
-   {
-     $count=count($_SESSION['shoppingchart']);
-     $item_array = array(
-       'item_id' => $_GET['id'],
-       'item_name' => $_POST['hidden_name'],
-       'item_price' => $_POST['hidden_price'],
-       'item_quantity' => $_POST['quantity'],
-     );
-     $_SESSION['shoppingchart'][$count]=$item_array;
-     echo '<script>window.location="index.php"</script>';
-   }
-
-   }else {
-    $item_array=array(
-      'item_id' => $_GET['id'],
-      'item_name' => $_POST['hidden_name'],
-      'item_price' => $_POST['hidden_price'],
-      'item_quantity' => $_POST['quantity'],
-    );
-
-    $_SESSION['shoppingchart'][0]=$item_array;
-   }
- }
-
- ?>
+?>
 
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Shopping Chart</title>
-    <!-- CSS only -->
-    <link rel="stylesheet" href="stylesheet/style.css">
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-   <!-- JavaScript Bundle with Popper -->
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <head>
+            <title> Account </title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+            <link rel="stylesheet" type="text/css" href="stylesheet/mode.css" >
+    </head>
 
-  </head>
-  <body>
-<div class="container" style="width: 65%">
-    <h2>Shopping Cart</h2>
-  <?php
-  $sql="SELECT * FROM products;";
-  $result=mysqli_query($conn,$sql);
-  while($row=mysqli_fetch_assoc($result))
-  {
-    //echo $row["id"]." ".$row['name']. " ".$row['image']." ".$row['price']."<br>";
-  ?>
+    <body>
+        <div class= "d-flex justify-content-center">
+            <div class="header">
 
-  <div class="gallery">
-    <form method="post" action="index.php?action=add&id=<?php echo $row['id']; ?>">
-      <img src="images/<?php echo $row['image'] ?>" class="center">
-      <h5 class="text-center"><?php echo $row['name']; ?></h5>
-      <h6 class="text-center">Price $<?php echo $row['price']; ?></h6>
-     <input type="number" name="quantity" class="form-control" value = 1>
-      <input type="hidden" name="hidden_name" value="<? php echo $row['name']?>">
-      <input type="hidden" name=hidden_price" value="<? php echo $row['price'] ?>">
-      <input type="submit" name="add" style="margin-top: 5px;" class="btn btn-success" value="Add to Cart">
-    </form>
-  </div>
+            </div>
 
-    <?php
-    }
 
-     ?>
 
-<div style="clear: both"></div>
-<h3 class="title2">Shopping Cart Details</h3>
-<div class="table-responsive">
-<table class = "table table-borded">
-  <tr>
-    <th width="30%">Product Name</th>
-    <th width="10%">Quantity</th>
-    <th width="13%">Price Details</th>
-    <th width="10%">Total Price</th>
-    <th width= "17%">Remove Items</th>
-  </tr>
+            <div class = "container">
+              <?php include "oasisgarden.php"; ?>
+            <?php if (isset($_SESSION['success'])) : ?>
+                <div class="error success" >
+                    <h3>
+                        <?php
+                            echo $_SESSION['success'];
+                            unset($_SESSION['success']);
+                        ?>
+                    </h3>
+                </div>
+            <?php endif ?>
 
-<?php
-if(!empty($_POST['shoppingchart']))
-{
-  $total=0;
-  foreach ($_SESSION['shoppingchart'] as $key => $value)
-  {
-    ?>
+            <?php  if (isset($_SESSION['username'])) : ?>
+                <p>
+                    Welcome
+                    <strong>
+                        <?php echo $_SESSION['username']; ?>
+                    </strong>
+                </p>
+                <p>
+                    <a href="credit.php" style="color: blue;">
+                        Click here to add credit card info <br>
+                    </a>
 
-<tr>
-  <td><?php echo $value['item_name']; ?></td>
-  <td><?php echo $value['item_quantity']; ?></td>
-  <td><?php echo $value['item_price']; ?></td>
-  <td><?php number_format($value['item_price']*$value['item_quantity']); ?></td>
-  <td><a href = "index.php?action=delete&id=<<?php echo value['id']; ?>">Remove</td>
+                    <a href="address.php" style="color: blue;">
+                        Click here to add shipping address <br>
+                    </a>
+                </p>
+            <?php endif ?>
 
-</tr>
-  <?php
-    // code...
-  }
-}
+            </div>
+        </div>
 
- ?>
+        <div class="wrapper" onclick="darkModeFunction()">
+        <input type="checkbox" name="check" class="switch">
+      </div>
+      <!-- This is the dark mode toggle button -->
 
-</table>
-</div>
+      <!-- this is the script tag for the toggle button -->
+      <script type="text/javascript" src="main.js"></script>
+      <script>
+        // copy this js function into main.js
+        function darkModeFunction() {
+          var element = document.body;
+          element.classList.toggle("dark-mode");
+        }
+      </script>
 
-</div>
-</body>
+      <footer>
+            <div class="column" align="center">
+                <a href="https://www.facebook.com/OasisFullertonStore">
+                    <img src="imgs/facebook.png" alt="facebook" >
+                </a>
+                <a href="https://www.instagram.com/oasisestore/">
+                <img src="imgs/instagram.png" alt="instagram" >
+                </a>
+                <a href="https://twitter.com/oasisstore2">
+                <img src="imgs/twitter.png" alt="twitter" >
+                </a>
+        </div>
+      </footer>
+
+    </body>
 </html>
