@@ -1,2 +1,1 @@
-# Ecommercewebsite
-This is a school project that I did using PHP, Juery, HTML, and CSS.
+# Ecommercewebsite that sells essential oils written in PHP, Juery, HTML, and CSS.
